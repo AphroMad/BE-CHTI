@@ -1,0 +1,36 @@
+10) La présence d'une raie de de rang 31 est causée par le fait d'utiliser temps de simulation qui n'est qu'une partie du temps total.  
+Il s'agit de la fréquence symétrique créée par la TFD.
+
+11) On se retouve avec la fréquence fondamentale proche du rang de la fréquence symétrique.  
+On remarque aue notre nombre d'echantillons est à présent trop faible.
+On se retrouve avec de nombreuses périodes sur notre sinusoïde et trop peu de points sur chacune d'entre elles.  
+Tout ceci pousse notre FFT à interprêter notre signal comme deux sinusoïdes.
+
+12) Ici, on assiste à un repliement de spectre.  
+L'ensemble de nos spectre sont très proche de 0 car la fréquence et sa symétrique s'annulent mutuellement.
+
+13) Ici, on retrouve un spectre sur la bonne fréquence mais elle est intervertie avec sa symétrique.
+
+14) Comme détaillé dans le cours, il nous faut donc une fréquence d'echantillonnage supérieure à deux fois la fréquence de notre signal.
+
+15) On retrouve des raies autour de notre fréquence fondamentale mais aucune ne lui correspond.
+Ce résultat pose problème car on ne retrouve pas la fréquence voulue mais aussi car il pourrait prendre la fréquence d'autres pistolets dans le cadre du jeu.
+
+16) Pour obtenir une raie unique, notre largeur de fenêtre doit être de l'ordre de 1/(diviseur de Fsin).
+
+17) On pose T = 1/14 et l'on retrouve le résultat attendu
+
+## Le projet Laser game
+
+3) Grâce à l'echelle log, on remarque que les raies auparavant très proche de zéros sont à présent à un ordre plus important.
+
+4) En truquant artificiellement notre échantillonnage, on peut remarquer que dans ce cas de figure certaines de nos fréquences fondamentales sont diminuées.
+On peut également voir que des "résidus" apparaissent autour d'elles ce qui pourrait poser problème lors de la détection.
+
+5) La FFT d'un signal carré donnerai T*sinc(pi*f*T) (cf cours 2)
+
+6) La FFT obtenue est bien un sinus cardinal dont le pic est à 85kHz.  
+On se retrouve avec le même problème de "résidus" que précédemment.  
+Il y a également d'autres sinus cardinaux qui se reportent sur les multiples de 85kHz.
+
+7) On met en place un filtre passe-bas, il nous permettra de d'ignorer les multiples de 85kHz.  

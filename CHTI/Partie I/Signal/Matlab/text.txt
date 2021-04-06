@@ -1,0 +1,19 @@
+10. Le spectre d'un signal sinusoïdal obtenu à partir de la TFD présente deux
+raies, l'une à la fréquence fondamentale f0, et l'autre à la fréquence symétrique Fe-f0
+
+11. L'échangtillonage est très peu précis, dans le cadre où on ne sait pas que c'est une fontion sinusoïdale gardant la même amplitude, alors on peut se tromper en essayant de rejoindre les points.
+
+12. De la même manière que pour la question précédente, si l'on ne sait pas que c'est une fonction sinosoïdale, on pourrait interpreter une droite restant sur l'axe des abscisses. 
+    TF symétrique aussi. 
+
+13. RAD de + 
+
+14. Bien si Fsin = 1 / T sinon trop compliqué à déchiffrer. 
+
+15. Symétrie quasi parfaite (manque un bout à droite). Ne touche jamais 0 en ordonnée. 2 raies larges. Don't know what to say. 
+
+16. No idea
+
+
+
+

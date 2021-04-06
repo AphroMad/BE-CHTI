@@ -1,0 +1,314 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 PRESERVE8
+    2 00000000                 THUMB
+    3 00000000         
+    4 00000000                 include          Driver/DriverJeuLaser.inc
+    1 00000000         
+    2 00000000         ; Bibliotheque DriverJeuLaser (ancienne gassp72 adaptée 
+                       2021 - TR)
+    3 00000000         ; Accès en aux fonctions suivantes :
+    4 00000000         ; GPIO :
+    5 00000000         ; GPIOA_Set(char Broche), GPIOB_Set(char Broche), GPIOC_
+                       Set(char Broche)
+    6 00000000         ; GPIOA_Clear(char Broche), GPIOB_Clear(char Broche), GP
+                       IOC_Clear(char Broche)
+    7 00000000         
+    8 00000000         ; PWM :
+    9 00000000         ;/**
+   10 00000000         ; * @brief  Fixe une valeur de PWM, Val, en tick horloge
+                       . La rapport cyclique effectif
+   11 00000000         ; * est donc : rcy = Thaut_ticks / Periode_ticks
+   12 00000000         ; * @note   spécifique Jeu Laser, PWM liée exclusivement
+                        au TIM3, chan3
+   13 00000000         ; * @param  Thaut_ticks : durée de l'état haut d'une imp
+                       ulsion en Ticks
+   14 00000000         ;  * @retval None
+   15 00000000         ; */
+   16 00000000         
+   17 00000000         ;void PWM_Set_Value_TIM3_Ch3( unsigned short int Thaut_t
+                       icks);
+   18 00000000                 import           PWM_Set_Value_TIM3_Ch3
+   19 00000000         
+   20 00000000         
+   21 00000000         
+   22 00000000         ;/**
+   23 00000000         ; * @brief  Mise à 1 d'une broche GPIO 
+   24 00000000         ;  * @note   Une fonction par GPIO
+   25 00000000         ; * @param  Broche : 0 à 15
+   26 00000000         ; * @retval None
+   27 00000000         ; */
+   28 00000000         
+   29 00000000         ;void GPIOA_Set(char Broche);
+   30 00000000                 import           GPIOA_Set
+   31 00000000         
+   32 00000000         ;void GPIOB_Set(char Broche);
+   33 00000000                 import           GPIOB_Set
+   34 00000000         
+   35 00000000         ;void GPIOC_Set(char Broche);
+   36 00000000                 import           GPIOC_Set
+   37 00000000         
+   38 00000000         
+   39 00000000         
+   40 00000000         ;/**
+   41 00000000         ; * @brief  Mise à 0 d'une broche GPIO 
+   42 00000000         ;  * @note   Une fonction par GPIO
+   43 00000000         ; * @param  Broche : 0 à 15
+   44 00000000         ; * @retval None
+   45 00000000         ;  */
+   46 00000000         
+   47 00000000         ;void GPIOA_Clear(char Broche);
+   48 00000000                 import           GPIOA_Clear
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   49 00000000         
+   50 00000000         ;void GPIOB_Clear(char Broche);
+   51 00000000                 import           GPIOB_Clear
+   52 00000000         
+   53 00000000         ;void GPIOC_Clear(char Broche);
+   54 00000000                 import           GPIOC_Clear
+   55 00000000         
+   56 00000000                 end
+    5 00000000         
+    6 00000000         ; ====================== zone de réservation de données,
+                         ======================================
+    7 00000000         ;Section RAM (read only) :
+    8 00000000                 area             mesdata,data,readonly
+    9 00000000         
+   10 00000000         
+   11 00000000         ;Section RAM (read write):
+   12 00000000                 area             maram,data,readwrite
+   13 00000000         
+   14 00000000 00000000 
+                       FlagCligno
+                               dcd              0           ; Initialisation de
+                                                             la variable FlagCl
+                                                            igno à 0
+   15 00000004         
+   16 00000004                 export           FlagCligno
+   17 00000004         
+   18 00000004         ; ======================================================
+                       =========================================
+   19 00000004                 EXPORT           callback    ; la fonction Delay
+                                                            _100ms est rendue p
+                                                            ublique donc utilis
+                                                            able par d'autres m
+                                                            odules.
+   20 00000004         
+   21 00000004         
+   22 00000004         
+   23 00000004         ;Section ROM code (read only) :  
+   24 00000004                 area             moncode,code,readonly
+   25 00000000         ; écrire le code 
+   26 00000000         
+   27 00000000         
+   28 00000000         
+   29 00000000         callback
+                               proc
+   30 00000000 E92D 4FF0       push             {r4-r11,lr} ; valeur pile trucm
+                                                            uche 
+   31 00000004 F04F 0001       mov              r0, #1      ; 
+   32 00000008 4908            ldr              r1, =FlagCligno ; Load de l'adr
+                                                            esse de flagCligno 
+                                                            dans r1 
+   33 0000000A 680A            ldr              r2, [r1]    ;  Load la valeur d
+                                                            e r1 dans r2 
+   34 0000000C 2A00            cmp              r2, #0      ; on compare la var
+                                                            iable FlagCligno av
+                                                            ec 0 
+   35 0000000E D104            bne              Passage1    ; si cmp raise un f
+                                                            lag, alors on jump 
+                                                            à Passage1
+   36 00000010 F7FF FFFE       bl               GPIOB_Set   ; 
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+   37 00000014 F04F 0201       mov              r2, #1      ; ; si le flag n'es
+                                                            t pas raise, on att
+                                                            ribue à r1 la valeu
+                                                            r 1 
+   38 00000018         
+   39 00000018 E003            b                fin         ; on jump a fin pou
+                                                            r éviter Passage1
+   40 0000001A         
+   41 0000001A         Passage1
+   42 0000001A F7FF FFFE       bl               GPIOB_Clear ; On éteint la led 
+                                                            
+   43 0000001E F04F 0200       mov              r2, #0      ; Le flag est raise
+                                                             donc on attribue a
+                                                             r1 la valeur 0 
+   44 00000022         
+   45 00000022         fin
+   46 00000022 4902            ldr              r1, =FlagCligno ; Load de l'adr
+                                                            esse de flagCligno 
+                                                            dans r1 
+   47 00000024 600A            str              r2, [r1]    ; on store la nouve
+                                                            lle valeur de r1 da
+                                                            ns r2 
+   48 00000026 E8BD 4FF0       pop              {r4-r11,lr}
+   49 0000002A 4770            bx               lr
+   50 0000002C                 endp
+   51 0000002C         
+   52 0000002C                 END
+              00000000 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
+ork --depend=.\obj\cligno.d -o.\obj\cligno.o -I.\RTE\_CibleSondeKEIL -IC:\Progr
+amdata\Keil\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include -IC:\Programdata\Keil\
+Arm\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include --predefine="__EVAL SETA 1" -
+-predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 530" --prede
+fine="_RTE_ SETA 1" --predefine="STM32F10X_MD SETA 1" --predefine="_RTE_ SETA 1
+" --list=cligno.lst Src\Cligno.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+mesdata 00000000
+
+Symbol: mesdata
+   Definitions
+      At line 8 in file Src\Cligno.s
+   Uses
+      None
+Comment: mesdata unused
+1 symbol
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+FlagCligno 00000000
+
+Symbol: FlagCligno
+   Definitions
+      At line 14 in file Src\Cligno.s
+   Uses
+      At line 16 in file Src\Cligno.s
+      At line 32 in file Src\Cligno.s
+      At line 46 in file Src\Cligno.s
+
+maram 00000000
+
+Symbol: maram
+   Definitions
+      At line 12 in file Src\Cligno.s
+   Uses
+      None
+Comment: maram unused
+2 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+Passage1 0000001A
+
+Symbol: Passage1
+   Definitions
+      At line 41 in file Src\Cligno.s
+   Uses
+      At line 35 in file Src\Cligno.s
+Comment: Passage1 used once
+callback 00000000
+
+Symbol: callback
+   Definitions
+      At line 29 in file Src\Cligno.s
+   Uses
+      At line 19 in file Src\Cligno.s
+Comment: callback used once
+fin 00000022
+
+Symbol: fin
+   Definitions
+      At line 45 in file Src\Cligno.s
+   Uses
+      At line 39 in file Src\Cligno.s
+Comment: fin used once
+moncode 00000000
+
+Symbol: moncode
+   Definitions
+      At line 24 in file Src\Cligno.s
+   Uses
+      None
+Comment: moncode unused
+4 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+GPIOA_Clear 00000000
+
+Symbol: GPIOA_Clear
+   Definitions
+      At line 48 in file Driver\DriverJeuLaser.inc
+   Uses
+      None
+Comment: GPIOA_Clear unused
+GPIOA_Set 00000000
+
+Symbol: GPIOA_Set
+   Definitions
+      At line 30 in file Driver\DriverJeuLaser.inc
+   Uses
+      None
+Comment: GPIOA_Set unused
+GPIOB_Clear 00000000
+
+Symbol: GPIOB_Clear
+   Definitions
+      At line 51 in file Driver\DriverJeuLaser.inc
+   Uses
+      At line 42 in file Src\Cligno.s
+Comment: GPIOB_Clear used once
+GPIOB_Set 00000000
+
+Symbol: GPIOB_Set
+   Definitions
+      At line 33 in file Driver\DriverJeuLaser.inc
+   Uses
+      At line 36 in file Src\Cligno.s
+Comment: GPIOB_Set used once
+GPIOC_Clear 00000000
+
+Symbol: GPIOC_Clear
+   Definitions
+      At line 54 in file Driver\DriverJeuLaser.inc
+   Uses
+      None
+Comment: GPIOC_Clear unused
+GPIOC_Set 00000000
+
+Symbol: GPIOC_Set
+   Definitions
+      At line 36 in file Driver\DriverJeuLaser.inc
+   Uses
+      None
+Comment: GPIOC_Set unused
+PWM_Set_Value_TIM3_Ch3 00000000
+
+Symbol: PWM_Set_Value_TIM3_Ch3
+   Definitions
+      At line 18 in file Driver\DriverJeuLaser.inc
+   Uses
+      None
+Comment: PWM_Set_Value_TIM3_Ch3 unused
+7 symbols
+351 symbols in table

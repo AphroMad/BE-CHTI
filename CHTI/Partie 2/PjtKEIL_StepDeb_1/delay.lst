@@ -1,0 +1,215 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 PRESERVE8
+    2 00000000                 THUMB
+    3 00000000         
+    4 00000000         
+    5 00000000         ; ====================== zone de réservation de données,
+                         ======================================
+    6 00000000         ;Section RAM (read only) :
+    7 00000000                 area             mesdata,data,readonly
+    8 00000000         
+    9 00000000         
+   10 00000000         ;Section RAM (read write):
+   11 00000000                 area             maram,data,readwrite
+   12 00000000         
+   13 00000000                 export           VarTime     ; 
+   14 00000000         
+   15 00000000         ; Vartime = label (pour nommer une adresse) 
+   16 00000000 00000000 
+                       VarTime dcd              0           ; Réserve la mémoir
+                                                            e et défini le cont
+                                                            enu initial de la v
+                                                            ariable VarTime à 0
+                                                             
+   17 00000004         
+   18 00000004         
+   19 00000004         ; ======================================================
+                       =========================================
+   20 00000004         
+   21 00000004         ;constantes (équivalent du #define en C)
+   22 00000004 000DBBA0 
+                       TimeValue
+                               equ              900000
+   23 00000004         
+   24 00000004         
+   25 00000004                 EXPORT           Delay_100ms ; la fonction Delay
+                                                            _100ms est rendue p
+                                                            ublique donc utilis
+                                                            able par d'autres m
+                                                            odules.
+   26 00000004         
+   27 00000004         
+   28 00000004         ;Section ROM code (read only) :  
+   29 00000004                 area             moncode,code,readonly
+   30 00000000         
+   31 00000000         
+   32 00000000         
+   33 00000000         ; REMARQUE IMPORTANTE 
+   34 00000000         ; Cette manière de créer une temporisation n'est clairem
+                       ent pas la bonne manière de procéder :
+   35 00000000         ; - elle est peu précise
+   36 00000000         ; - la fonction prend tout le temps CPU pour... ne rien 
+                       faire...
+   37 00000000         ;
+   38 00000000         ; Pour autant, la fonction montre :
+   39 00000000         ; - les boucles en ASM
+   40 00000000         ; - l'accés écr/lec de variable en RAM
+   41 00000000         ; - le mécanisme d'appel / retour sous programme
+   42 00000000         ;
+   43 00000000         ; et donc possède un intérêt pour débuter en ASM pur
+   44 00000000         
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   45 00000000         Delay_100ms
+                               proc
+   46 00000000         ; lecture en mémoire de Vartime / de l'addresse de la va
+                       riable et mise de valeur dans r0 
+   47 00000000 4803            ldr              r0,=VarTime ; Vartime (une adre
+                                                            sse) => r0
+   48 00000002         
+   49 00000002         ; lecture de TimeValue et mise de valeur dans r1 
+   50 00000002 4904            ldr              r1,=TimeValue ; TimeValue (cons
+                                                            tante = 900000)  =>
+                                                             r1 
+   51 00000004         
+   52 00000004         ; on met r1 dans la variable pointé par Vartime / r0
+   53 00000004 6001            str              r1,[r0]     ; r1 => Vartime.val
+                                                            ue
+   54 00000006         
+   55 00000006         BoucleTempo                          ; fonction dans une
+                                                             fonction 
+   56 00000006         
+   57 00000006 6801            ldr              r1,[r0]     ; Vartime.value => 
+                                                            r1 
+   58 00000008         
+   59 00000008         ; on soustrait r1 de 1 et si r1 = 0, ca active le flag  
+                        
+   60 00000008 3901            subs             r1,#1       ; r1 = r1 - 1 ET if
+                                                             r1 == 0 : flag Cle
+                                                            ar Zero = True 
+   61 0000000A         
+   62 0000000A         ; on met r1 dans la variable pointé par Vartime / r0
+   63 0000000A 6001            str              r1,[r0]     ; r1 => Vartime.val
+                                                            ue
+   64 0000000C         
+   65 0000000C         ; si le flag est pas activé, alors on jump sur BoucleTem
+                       po
+   66 0000000C D1FB            bne              BoucleTempo ; if flag Clear Zer
+                                                            o == True : Go To B
+                                                            oucleTempo 
+   67 0000000E         
+   68 0000000E         ; retour fonction, bx = branche , lr = adresse retour fo
+                       nction 
+   69 0000000E 4770            bx               lr          ; indirect jump to 
+                                                            lr ~= fin fonction 
+                                                            Delay ~= retour 
+   70 00000010         
+   71 00000010                 endp                         ; procedure pour le
+                                                             debuggeur 
+   72 00000010         
+   73 00000010         
+   74 00000010                 END
+              00000000 
+              000DBBA0 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
+ork --depend=.\obj\delay.d -o.\obj\delay.o -I.\RTE\_CibleSondeKEIL -IC:\Program
+data\Keil\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include -IC:\Programdata\Keil\Ar
+m\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include --predefine="__EVAL SETA 1" --p
+redefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 530" --predefi
+ne="_RTE_ SETA 1" --predefine="STM32F10X_MD SETA 1" --predefine="_RTE_ SETA 1" 
+--list=delay.lst Src\Delay.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+mesdata 00000000
+
+Symbol: mesdata
+   Definitions
+      At line 7 in file Src\Delay.s
+   Uses
+      None
+Comment: mesdata unused
+1 symbol
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+VarTime 00000000
+
+Symbol: VarTime
+   Definitions
+      At line 16 in file Src\Delay.s
+   Uses
+      At line 13 in file Src\Delay.s
+      At line 47 in file Src\Delay.s
+
+maram 00000000
+
+Symbol: maram
+   Definitions
+      At line 11 in file Src\Delay.s
+   Uses
+      None
+Comment: maram unused
+2 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+BoucleTempo 00000006
+
+Symbol: BoucleTempo
+   Definitions
+      At line 55 in file Src\Delay.s
+   Uses
+      At line 66 in file Src\Delay.s
+Comment: BoucleTempo used once
+Delay_100ms 00000000
+
+Symbol: Delay_100ms
+   Definitions
+      At line 45 in file Src\Delay.s
+   Uses
+      At line 25 in file Src\Delay.s
+Comment: Delay_100ms used once
+moncode 00000000
+
+Symbol: moncode
+   Definitions
+      At line 29 in file Src\Delay.s
+   Uses
+      None
+Comment: moncode unused
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+TimeValue 000DBBA0
+
+Symbol: TimeValue
+   Definitions
+      At line 22 in file Src\Delay.s
+   Uses
+      At line 50 in file Src\Delay.s
+Comment: TimeValue used once
+1 symbol
+344 symbols in table
