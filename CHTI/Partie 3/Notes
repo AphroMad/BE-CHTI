@@ -1,0 +1,18 @@
+8. Quelle condition pour quel signal PWM soit à l'état bas ?
+
+    Pour que le signal PWM passe à l'état bas, il fautque le compteur atteigne la valeur CompValue fixée au préalable et changée au cours du temps
+    
+A l'état haut ?
+
+    Pour que le signal passe à l'état haut, il suffit que le compteur déborde ie. arrive à la valeur maximale 256 pour 8 bits
+
+
+9. Comparer le signal en sortie de filtre avec le signal que l'on veut transmettre
+
+    Le signal en sortie est la moyenne des valeurs du signal carré.
+    
+10. Quelle est alors la fréquence de la PWM
+
+    La fréquence de la PWM est alors : 9.9936 micros
+
+
