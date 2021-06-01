@@ -1,5 +1,5 @@
 #include "DriverJeuLaser.h"
-extern short int *LeSignal ; 
+
 
 int DFT_ModuleAuCarre( short int * Signal64ech, char k) ;
 int TLDR[64] ; 
@@ -8,18 +8,18 @@ short int dma_buf[64] ;
 int fnormal[6] = {17,18,19,20,22,23};
 int score[6] = {0,0,0,0,0,0}; 
 int k ; 
-int test = 0 ; 
+
 
 void callback_sys(void ){
 	Start_DMA1(64);
-	//Wait_On_End_Of_DMA1();
+	Wait_On_End_Of_DMA1();
 	Stop_DMA1; 
 
 	for (int i = 0; i < 64 ; i ++ ) 
 	{
-		test += 1 ; // pour test 
-		TLDR[i] = DFT_ModuleAuCarre(LeSignal, i); // pour des tests 
-		print[i] = LeSignal;  // pour test 
+		
+		// TLDR[i] = DFT_ModuleAuCarre(LeSignal, i); // pour partie simu 
+		
 		k = fnormal[i] ; 
 		
 		if (DFT_ModuleAuCarre(dma_buf, k) > 0 ) 
